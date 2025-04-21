@@ -67,6 +67,7 @@ jobs:
           # Get current date in YYYYMMDD format
           CURRENT_DATE=$(date '+%Y%m%d')
           
+          # Use relative path to the spec file
           SPEC_FILE="virglrenderer.spec"
           
           # Read current version from spec file
@@ -81,7 +82,7 @@ jobs:
           
           echo "New version: $NEW_VERSION"
           
-          # Create a temp file and update the spec file
+          # Update the spec file
           sed -i "s/^Version:.*$/Version:\t$NEW_VERSION/" "$SPEC_FILE"
           sed -i "s|^Source:.*$|Source:         https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/$LATEST_VIRGL_COMMIT/virglrenderer-$LATEST_VIRGL_COMMIT.tar.bz2|" "$SPEC_FILE"
           
@@ -93,6 +94,6 @@ jobs:
       - name: Commit and push changes
         if: steps.check-mesa.outputs.changed == 'true'
         run: |
-          git add "/home/danayer/Загрузки/virglrenderer.spec" .github/tracking/last_mesa_commit
+          git add "virglrenderer.spec" .github/tracking/last_mesa_commit
           git commit -m "Update virglrenderer to latest commit based on mesa-git changes"
           git push
