@@ -1,4 +1,4 @@
-name: Update Virglrenderer Spec
+name: Update virglrenderer spec file
 
 on:
   schedule:
@@ -9,12 +9,12 @@ jobs:
   check-and-update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Needed for pushing changes
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch all history so we can push
+          fetch-depth: 0
 
       - name: Setup Git
         run: |
@@ -62,13 +62,14 @@ jobs:
           # Get the latest commit from virglrenderer
           LATEST_VIRGL_COMMIT=$(curl -s "https://gitlab.freedesktop.org/api/v4/projects/577/repository/commits" | jq -r '.[0].id')
           VIRGL_SHORT_COMMIT=${LATEST_VIRGL_COMMIT:0:8}
-          echo "Latest virglrenderer commit: $VIRGL_SHORT_COMMIT"
+          echo "Latest virglrenderer commit: $LATEST_VIRGL_COMMIT"
           
           # Get current date in YYYYMMDD format
           CURRENT_DATE=$(date '+%Y%m%d')
           
+          SPEC_FILE="/home/danayer/Загрузки/virglrenderer.spec"
+          
           # Read current version from spec file
-          SPEC_FILE="virglrenderer.spec"
           CURRENT_VERSION=$(grep -oP '^Version:\s*\K[0-9.]+' "$SPEC_FILE")
           echo "Current version: $CURRENT_VERSION"
           
@@ -81,17 +82,13 @@ jobs:
           echo "New version: $NEW_VERSION"
           
           # Create a temp file and update the spec file
-          TMP_FILE=$(mktemp)
-          sed "s/^Version:.*$/Version:	$NEW_VERSION/" "$SPEC_FILE" > "$TMP_FILE"
-          sed -i "s|^Source:.*$|Source:         https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/$LATEST_VIRGL_COMMIT/virglrenderer-$LATEST_VIRGL_COMMIT.tar.bz2|" "$TMP_FILE"
+          sed -i "s/^Version:.*$/Version:\t$NEW_VERSION/" "$SPEC_FILE"
+          sed -i "s|^Source:.*$|Source:         https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/$LATEST_VIRGL_COMMIT/virglrenderer-$LATEST_VIRGL_COMMIT.tar.bz2|" "$SPEC_FILE"
           
           # Add new changelog entry
-          CHANGELOG_ENTRY="* $(date '+%a %b %d %Y') Automated Update <github-actions@github.com> - $NEW_VERSION-1.git$VIRGL_SHORT_COMMIT\n- Automated update based on changes in mesa-git\n- Using latest virglrenderer commit $LATEST_VIRGL_COMMIT"
-          sed -i "/^%changelog/a $CHANGELOG_ENTRY" "$TMP_FILE"
-          
-          # Replace the original file
-          cat "$TMP_FILE" > "$SPEC_FILE"
-          rm "$TMP_FILE"
+          TODAY=$(date '+%a %b %d %Y')
+          CHANGELOG_ENTRY="* $TODAY GitHub Actions Bot <actions@github.com> - $NEW_VERSION-1.git$VIRGL_SHORT_COMMIT\n- Automated update based on changes in mesa-git\n- Using latest virglrenderer commit $LATEST_VIRGL_COMMIT"
+          sed -i "/^%changelog/a $CHANGELOG_ENTRY" "$SPEC_FILE"
       
       - name: Commit and push changes
         if: steps.check-mesa.outputs.changed == 'true'
