@@ -68,7 +68,7 @@ jobs:
           CURRENT_DATE=$(date '+%Y%m%d')
           
           # Read current version from spec file
-          SPEC_FILE="/home/danayer/Загрузки/virglrenderer.spec"
+          SPEC_FILE="virglrenderer.spec"
           CURRENT_VERSION=$(grep -oP '^Version:\s*\K[0-9.]+' "$SPEC_FILE")
           echo "Current version: $CURRENT_VERSION"
           
