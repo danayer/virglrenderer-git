@@ -1,7 +1,6 @@
 %global commit cae17ceea2cc2438bc81824b6dd55825b00f48de
 %global shortcommit cae17ce
 
-
 Name:		virglrenderer
 Version:	1.1.4
 Release:	1.git%{shortcommit}%{?dist}
@@ -10,7 +9,7 @@ Summary:	Virgl Rendering library.
 License:	MIT
 
 # Updated Source URL to match mesa format
-Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/master/virglrenderer-master.tar.gz
+Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/%{commit}/virglrenderer-%{commit}.tar.gz#/virglrenderer-%{commit}.tar.gz
 
 BuildRequires:  meson
 BuildRequires:  gcc
@@ -47,8 +46,8 @@ that can be used along with the mesa virgl
 driver to test virgl rendering without GL.
 
 %prep
-# Use proper directory name from GitLab archive
-%autosetup -n %{name}-%{commit} -p1
+# Use a more robust setup approach to handle GitLab's directory naming
+%setup -q -n virglrenderer-%{commit}
 
 %build
 %meson -Dvideo=true -Dvenus=true
@@ -72,10 +71,7 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
-* Mon Apr 21 2025 GitHub Actions Bot <actions@github.com> - 1.1.4-1.gitcae17ce
-- Automated update based on changes in mesa-git
-- Using latest virglrenderer commit cae17ceea2cc2438bc81824b6dd55825b00f48de
-* Wed Apr 02 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 1.1.3-1.gitc674db5
+* Wed Apr 02 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 1.1.4-1.gitcae17ce
 - new version, fixes rhbz#2357013
 
 * Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-2
