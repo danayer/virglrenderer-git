@@ -8,10 +8,14 @@ on:
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed for pushing changes
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+        with:
+          fetch-depth: 0  # Fetch all history so we can push
+
       - name: Setup Git
         run: |
           git config user.name "GitHub Actions Bot"
@@ -24,20 +28,28 @@ jobs:
           LATEST_MESA_COMMIT=$(curl -s "https://api.github.com/repos/danayer/mesa-git/commits/main" | jq -r .sha)
           echo "Latest mesa-git commit: $LATEST_MESA_COMMIT"
           
-          # Store the commit hash in a file if it doesn't exist
-          if [ ! -f ".last_mesa_commit" ]; then
-            echo $LATEST_MESA_COMMIT > .last_mesa_commit
-            echo "First run, storing current commit"
+          # Create tracking directory if it doesn't exist
+          mkdir -p .github/tracking
+          
+          # Check if tracking file exists
+          TRACKING_FILE=".github/tracking/last_mesa_commit"
+          if [ ! -f "$TRACKING_FILE" ]; then
+            echo "First run, creating tracking file"
+            mkdir -p $(dirname "$TRACKING_FILE")
+            echo "$LATEST_MESA_COMMIT" > "$TRACKING_FILE"
+            git add "$TRACKING_FILE"
+            git commit -m "Initialize mesa-git commit tracking"
+            git push
             echo "changed=false" >> $GITHUB_OUTPUT
             exit 0
           fi
           
-          LAST_MESA_COMMIT=$(cat .last_mesa_commit)
+          LAST_MESA_COMMIT=$(cat "$TRACKING_FILE")
           echo "Previous mesa-git commit: $LAST_MESA_COMMIT"
           
           if [ "$LATEST_MESA_COMMIT" != "$LAST_MESA_COMMIT" ]; then
             echo "Changes detected in mesa-git"
-            echo $LATEST_MESA_COMMIT > .last_mesa_commit
+            echo "$LATEST_MESA_COMMIT" > "$TRACKING_FILE"
             echo "changed=true" >> $GITHUB_OUTPUT
           else
             echo "No changes in mesa-git"
@@ -56,7 +68,8 @@ jobs:
           CURRENT_DATE=$(date '+%Y%m%d')
           
           # Read current version from spec file
-          CURRENT_VERSION=$(grep -oP '^Version:\s*\K[0-9.]+' /home/danayer/Загрузки/virglrenderer.spec)
+          SPEC_FILE="/home/danayer/Загрузки/virglrenderer.spec"
+          CURRENT_VERSION=$(grep -oP '^Version:\s*\K[0-9.]+' "$SPEC_FILE")
           echo "Current version: $CURRENT_VERSION"
           
           # Parse the version and increment the last part
@@ -67,17 +80,22 @@ jobs:
           
           echo "New version: $NEW_VERSION"
           
-          # Update the spec file
-          sed -i "s/^Version:.*$/Version:	$NEW_VERSION/" /home/danayer/Загрузки/virglrenderer.spec
-          sed -i "s|^Source:.*$|Source:         https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/$LATEST_VIRGL_COMMIT/virglrenderer-$LATEST_VIRGL_COMMIT.tar.bz2|" /home/danayer/Загрузки/virglrenderer.spec
+          # Create a temp file and update the spec file
+          TMP_FILE=$(mktemp)
+          sed "s/^Version:.*$/Version:	$NEW_VERSION/" "$SPEC_FILE" > "$TMP_FILE"
+          sed -i "s|^Source:.*$|Source:         https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/$LATEST_VIRGL_COMMIT/virglrenderer-$LATEST_VIRGL_COMMIT.tar.bz2|" "$TMP_FILE"
           
           # Add new changelog entry
           CHANGELOG_ENTRY="* $(date '+%a %b %d %Y') Automated Update <github-actions@github.com> - $NEW_VERSION-1.git$VIRGL_SHORT_COMMIT\n- Automated update based on changes in mesa-git\n- Using latest virglrenderer commit $LATEST_VIRGL_COMMIT"
-          sed -i "/^%changelog/a $CHANGELOG_ENTRY" /home/danayer/Загрузки/virglrenderer.spec
+          sed -i "/^%changelog/a $CHANGELOG_ENTRY" "$TMP_FILE"
+          
+          # Replace the original file
+          cat "$TMP_FILE" > "$SPEC_FILE"
+          rm "$TMP_FILE"
       
       - name: Commit and push changes
         if: steps.check-mesa.outputs.changed == 'true'
         run: |
-          git add /home/danayer/Загрузки/virglrenderer.spec .last_mesa_commit
+          git add "/home/danayer/Загрузки/virglrenderer.spec" .github/tracking/last_mesa_commit
           git commit -m "Update virglrenderer to latest commit based on mesa-git changes"
           git push
