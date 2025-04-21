@@ -1,11 +1,14 @@
+%global commit 123456789abcdef123456789abcdef123456789a
+%global shortcommit 1234567
+
 Name:		virglrenderer
 Version:	1.1.2
-Release:	1%{?dist}
+Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
 License:	MIT
 
-Source:         https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/c674db53d9f092b0227d24aed58ef5f37ad53a71/virglrenderer-c674db53d9f092b0227d24aed58ef5f37ad53a71.tar.bz2
+Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/%{commit}/virglrenderer-%{commit}.tar.bz2
 
 BuildRequires:  meson
 BuildRequires:  gcc
@@ -66,10 +69,7 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
-* Mon Apr 21 2025 GitHub Actions Bot <actions@github.com> - 1.1.2-1.gitc674db53
-- Automated update based on changes in mesa-git
-- Using latest virglrenderer commit c674db53d9f092b0227d24aed58ef5f37ad53a71
-* Wed Apr 02 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 1.1.1-1
+* Wed Apr 02 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 1.1.2-1.git1234567
 - new version, fixes rhbz#2357013
 
 * Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-2
