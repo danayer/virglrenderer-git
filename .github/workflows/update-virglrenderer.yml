@@ -59,9 +59,33 @@ jobs:
       - name: Update virglrenderer spec file
         if: steps.check-mesa.outputs.changed == 'true'
         run: |
-          # Get the latest commit from virglrenderer
-          LATEST_VIRGL_COMMIT=$(curl -s "https://gitlab.freedesktop.org/api/v4/projects/577/repository/commits" | jq -r '.[0].id')
-          VIRGL_SHORT_COMMIT=${LATEST_VIRGL_COMMIT:0:7}
+          # Use correct URL-encoded path for virglrenderer project
+          echo "Fetching latest virglrenderer commit..."
+          
+          # Try to get the latest commit from the repository
+          LATEST_VIRGL_COMMIT=$(curl -s "https://gitlab.freedesktop.org/api/v4/projects/virgl%2Fvirglrenderer/repository/commits" | jq -r '.[0].id')
+          
+          # Check if we got a valid commit hash
+          if [[ ! "$LATEST_VIRGL_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Failed to get a valid commit hash from API. Response was: $LATEST_VIRGL_COMMIT"
+            echo "Checking repository directly..."
+            
+            # Try alternative approach - get from the web page
+            LATEST_VIRGL_COMMIT=$(curl -s "https://gitlab.freedesktop.org/virgl/virglrenderer/-/commits/master" | grep -o 'data-commit-id="[0-9a-f]\{40\}"' | head -1 | cut -d'"' -f2)
+            
+            if [[ ! "$LATEST_VIRGL_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "Still unable to get a valid commit hash. Using 'master' as fallback."
+              LATEST_VIRGL_COMMIT="master"
+              VIRGL_SHORT_COMMIT="master"
+            else
+              echo "Successfully retrieved commit hash from web page."
+              VIRGL_SHORT_COMMIT=${LATEST_VIRGL_COMMIT:0:7}
+            fi
+          else
+            echo "Successfully retrieved commit hash from API."
+            VIRGL_SHORT_COMMIT=${LATEST_VIRGL_COMMIT:0:7}
+          fi
+          
           echo "Latest virglrenderer commit: $LATEST_VIRGL_COMMIT"
           echo "Short commit: $VIRGL_SHORT_COMMIT"
           
@@ -98,7 +122,7 @@ jobs:
           sed -i "s/^Version:.*$/Version:\t$NEW_VERSION/" "$TMP_FILE"
           sed -i "s|^Release:.*$|Release:\t1.git%{shortcommit}%{?dist}|" "$TMP_FILE"
           
-          # Always use the master branch source URL
+          # Always use the master branch source URL as requested
           sed -i "s|^Source:.*$|Source:\t\t$MASTER_URL|" "$TMP_FILE"
           
           # Add new changelog entry
