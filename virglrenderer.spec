@@ -1,15 +1,16 @@
 %global commit cae17ceea2cc2438bc81824b6dd55825b00f48de
 %global shortcommit cae17ce
 
+
 Name:		virglrenderer
-Version:	1.1.4
+Version:	1.1.5
 Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
 License:	MIT
 
 # Updated Source URL to match mesa format
-Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/%{commit}/virglrenderer-%{commit}.tar.gz#/virglrenderer-%{commit}.tar.gz
+Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/master/virglrenderer-master.tar.gz
 
 BuildRequires:  meson
 BuildRequires:  gcc
@@ -71,6 +72,9 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Mon Apr 21 2025 GitHub Actions Bot <actions@github.com> - 1.1.5-1.gitcae17ce
+- Automated update based on changes in mesa-git
+- Using latest virglrenderer commit cae17ceea2cc2438bc81824b6dd55825b00f48de
 * Wed Apr 02 2025 Marc-André Lureau <marcandre.lureau@redhat.com> - 1.1.4-1.gitcae17ce
 - new version, fixes rhbz#2357013
 
