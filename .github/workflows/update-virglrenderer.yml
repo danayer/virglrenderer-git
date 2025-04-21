@@ -65,6 +65,29 @@ jobs:
           echo "Latest virglrenderer commit: $LATEST_VIRGL_COMMIT"
           echo "Short commit: $VIRGL_SHORT_COMMIT"
           
+          # Verify that we can access the archive (check that URL doesn't 404)
+          TEST_URL="https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/${LATEST_VIRGL_COMMIT}/virglrenderer-${LATEST_VIRGL_COMMIT}.tar.gz"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $TEST_URL)
+          
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Cannot access archive at $TEST_URL (status: $HTTP_STATUS)"
+            echo "Trying alternative URL format with .tar.bz2"
+            
+            TEST_URL="https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/${LATEST_VIRGL_COMMIT}/virglrenderer-${LATEST_VIRGL_COMMIT}.tar.bz2"
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $TEST_URL)
+            
+            if [ "$HTTP_STATUS" != "200" ]; then
+              echo "Failed to access archive with alternative format (status: $HTTP_STATUS)"
+              exit 1
+            fi
+            
+            echo "Alternative URL works, using .tar.bz2 format"
+            ARCHIVE_EXT="tar.bz2"
+          else
+            echo "URL check passed, using .tar.gz format"
+            ARCHIVE_EXT="tar.gz"
+          fi
+          
           # Get current date in YYYYMMDD format
           CURRENT_DATE=$(date '+%Y%m%d')
           
@@ -97,7 +120,7 @@ jobs:
           # Update Version and Source lines
           sed -i "s/^Version:.*$/Version:\t$NEW_VERSION/" "$TMP_FILE"
           sed -i "s|^Release:.*$|Release:\t1.git%{shortcommit}%{?dist}|" "$TMP_FILE"
-          sed -i "s|^Source:.*$|Source:\t\thttps://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/%{commit}/virglrenderer-%{commit}.tar.bz2|" "$TMP_FILE"
+          sed -i "s|^Source:.*$|Source:\t\thttps://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/%{commit}/virglrenderer-%{commit}.${ARCHIVE_EXT}|" "$TMP_FILE"
           
           # Add new changelog entry
           TODAY=$(date '+%a %b %d %Y')
