@@ -2,8 +2,9 @@
 %global shortcommit cae17ce
 
 
+
 Name:		virglrenderer
-Version:	1.1.5
+Version:	1.1.6
 Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
@@ -72,6 +73,9 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Tue Apr 22 2025 GitHub Actions Bot <actions@github.com> - 1.1.6-1.gitcae17ce
+- Automated update based on changes in mesa-git
+- Using latest virglrenderer commit cae17ceea2cc2438bc81824b6dd55825b00f48de
 * Mon Apr 21 2025 GitHub Actions Bot <actions@github.com> - 1.1.5-1.gitcae17ce
 - Automated update based on changes in mesa-git
 - Using latest virglrenderer commit cae17ceea2cc2438bc81824b6dd55825b00f48de
