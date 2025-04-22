@@ -11,7 +11,7 @@ Summary:	Virgl Rendering library.
 License:	MIT
 
 # Updated Source URL to match mesa format
-Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/master/virglrenderer-master.tar.gz
+Source:		https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/%{commit}/virglrenderer-%{commit}.tar.gz#/virglrenderer-%{commit}.tar.gz
 
 BuildRequires:  meson
 BuildRequires:  gcc
