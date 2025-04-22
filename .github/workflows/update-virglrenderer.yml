@@ -122,8 +122,7 @@ jobs:
           sed -i "s/^Version:.*$/Version:\t$NEW_VERSION/" "$TMP_FILE"
           sed -i "s|^Release:.*$|Release:\t1.git%{shortcommit}%{?dist}|" "$TMP_FILE"
           
-          # Always use the master branch source URL as requested
-          sed -i "s|^Source:.*$|Source:\t\t$MASTER_URL|" "$TMP_FILE"
+
           
           # Add new changelog entry
           TODAY=$(date '+%a %b %d %Y')
