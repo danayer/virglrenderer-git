@@ -2,7 +2,7 @@
 %global shortcommit db4fd04
 
 Name:		virglrenderer
-Version:	1.1.24
+Version:	1.1.25
 Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
