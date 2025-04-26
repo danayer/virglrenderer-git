@@ -2,7 +2,7 @@
 %global shortcommit db4fd04
 
 Name:		virglrenderer
-Version:	1.1.25
+Version:	1.1.26
 Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
@@ -50,7 +50,11 @@ driver to test virgl rendering without GL.
 %setup -q -n virglrenderer-%{commit}
 
 %build
-%meson -Dvideo=true -Dvenus=true -Ddrm-renderers=amdgpu-experimental -Dunstable-apis=true -Dvulkan-dload=true
+%ifarch x86_64 aarch64 ppc64 ppc64le s390x
+%meson -Dvideo=true -Dvenus=true -Ddrm-renderers=amdgpu-experimental,msm -Dunstable-apis=true -Dvulkan-dload=true -Dminigbm_allocation=true
+%else
+%meson -Dvideo=true -Dvenus=true -Ddrm-renderers=msm -Dunstable-apis=true -Dvulkan-dload=true -Dminigbm_allocation=true
+%endif
 %meson_build
 
 %install
