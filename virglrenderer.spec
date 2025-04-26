@@ -1,26 +1,6 @@
 %global commit db4fd046e0d861048473d8df5b3acabafce4bbc4
 %global shortcommit db4fd04
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Name:		virglrenderer
 Version:	1.1.24
 Release:	1.git%{shortcommit}%{?dist}
@@ -70,7 +50,7 @@ driver to test virgl rendering without GL.
 %setup -q -n virglrenderer-%{commit}
 
 %build
-%meson -Dvideo=true -Dvenus=true
+%meson -Dvideo=true -Dvenus=true -Ddrm-renderers=amdgpu-experimental -Dunstable-apis=true -Dvulkan-dload=true
 %meson_build
 
 %install
