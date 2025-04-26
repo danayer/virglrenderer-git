@@ -2,8 +2,9 @@
 %global shortcommit db4fd04
 
 
+
 Name:		virglrenderer
-Version:	1.1.27
+Version:	1.1.28
 Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
@@ -76,6 +77,9 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Sat Apr 26 2025 GitHub Actions Bot <actions@github.com> - 1.1.28-1.gitdb4fd04
+- Automated update based on changes in mesa-git
+- Using latest virglrenderer commit db4fd046e0d861048473d8df5b3acabafce4bbc4
 * Sat Apr 26 2025 GitHub Actions Bot <actions@github.com> - 1.1.27-1.gitdb4fd04
 - Automated update based on changes in mesa-git
 - Using latest virglrenderer commit db4fd046e0d861048473d8df5b3acabafce4bbc4
