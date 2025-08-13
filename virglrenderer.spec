@@ -478,8 +478,9 @@
 
 
 
+
 Name:		virglrenderer
-Version:	1.1.503
+Version:	1.1.504
 Release:	1.git%{shortcommit}%{?dist}
 
 Summary:	Virgl Rendering library.
@@ -552,6 +553,9 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Wed Aug 13 2025 GitHub Actions Bot <actions@github.com> - 1.1.504-1.git9622c61
+- Automated update based on changes in mesa-git
+- Using latest virglrenderer commit 9622c613c69a4cac450c1437345918d45e236a07
 * Tue Aug 12 2025 GitHub Actions Bot <actions@github.com> - 1.1.503-1.git9622c61
 - Automated update based on changes in mesa-git
 - Using latest virglrenderer commit 9622c613c69a4cac450c1437345918d45e236a07
